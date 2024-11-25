@@ -76,16 +76,16 @@ const constantSecretHash = '1pjnh197oqpsq03n7ul03u08q4nh23a7ltejphj77n34tm4lnjdt
 function signin(email, password, onSuccess, onFailure) {
     var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
         Username: toUsername(email),
-        Password: password
+        Password: password,
+        // Add the constant SECRET_HASH directly to the AuthenticationDetails object
+        SecretHash: constantSecretHash // Make sure SECRET_HASH is included here
     });
 
-    // Make sure SECRET_HASH is included in the authentication request
     var cognitoUser = createCognitoUser(email);
-    
+
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: onSuccess,
-        onFailure: onFailure,
-        clientMetadata: { SECRET_HASH: constantSecretHash }  // Pass the constant Secret Hash here
+        onFailure: onFailure
     });
 }
 

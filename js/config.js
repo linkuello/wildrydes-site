@@ -1,8 +1,8 @@
 window._config = {
   cognito: {
-    userPoolId: "us-east-2_9CYlQpbjT",
-    userPoolClientId: "fq0i6vr69hp4nv10861ngo8vu",
-    userPoolClientSecret: "1pjnh197oqpsq03n7ul03u08q4nh23a7ltejphj77n34tm4lnjdt",  // Your provided App Client Secret
+    userPoolId: "us-east-2_OMSUAd6QF",
+    userPoolClientId: "13i2gcc71grich6dr3a7pt52q2",
+    userPoolClientSecret: "7jht9aqejtmngel0pklsuna4rcrt9aefok79frit2a2gcsordvm",  // Your provided App Client Secret
     region: "us-east-2"
   },
   api: {

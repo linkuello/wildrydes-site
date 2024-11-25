@@ -1,3 +1,7 @@
+<!-- Подключите библиотеку CryptoJS для вычисления хеша -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1-crypto-js.min.js"></script>
+
+<script>
 /*global WildRydes _config AmazonCognitoIdentity AWSCognito*/
 
 var WildRydes = window.WildRydes || {};
@@ -47,6 +51,12 @@ var WildRydes = window.WildRydes || {};
         }
     });
 
+    // Функция для генерации SECRET_HASH
+    function generateSecretHash(username, clientId, clientSecret) {
+        var message = username + clientId;
+        var hash = CryptoJS.HmacSHA256(message, clientSecret);
+        return hash.toString(CryptoJS.enc.Base64);
+    }
 
     /*
      * Cognito User Pool functions
@@ -70,26 +80,23 @@ var WildRydes = window.WildRydes || {};
         );
     }
 
-    // Assuming you already have the constant secret hash
-const constantSecretHash = '1pjnh197oqpsq03n7ul03u08q4nh23a7ltejphj77n34tm4lnjdt'; // Your constant Secret Hash
+    function signin(email, password, onSuccess, onFailure) {
+        // Генерируем SECRET_HASH для аутентификации
+        var secretHash = generateSecretHash(toUsername(email), _config.cognito.userPoolClientId, _config.cognito.userPoolClientSecret);
+        
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
+            Username: toUsername(email),
+            Password: password,
+            SecretHash: secretHash // Передаем вычисленный SECRET_HASH
+        });
 
-function signin(email, password, onSuccess, onFailure) {
-    var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-        Username: toUsername(email),
-        Password: password,
-        // Add the constant SECRET_HASH directly to the AuthenticationDetails object
-        SecretHash: constantSecretHash // Make sure SECRET_HASH is included here
-    });
+        var cognitoUser = createCognitoUser(email);
 
-    var cognitoUser = createCognitoUser(email);
-
-    cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: onSuccess,
-        onFailure: onFailure
-    });
-}
-
-
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: onSuccess,
+            onFailure: onFailure
+        });
+    }
 
     function verify(email, code, onSuccess, onFailure) {
         createCognitoUser(email).confirmRegistration(code, true, function confirmCallback(err, result) {
@@ -122,23 +129,23 @@ function signin(email, password, onSuccess, onFailure) {
         $('#verifyForm').submit(handleVerify);
     });
 
-    // Sign-in handler
+    // Обработчик входа
     function handleSignin(event) {
-    var email = $('#emailInputSignin').val();
-    var password = $('#passwordInputSignin').val();
-    event.preventDefault();
-    signin(email, password,
-        function signinSuccess() {
-            console.log('Successfully Logged In');
-            window.location.href = 'ride.html';
-        },
-        function signinError(err) {
-            alert(err);
-        }
-    );
-}
+        var email = $('#emailInputSignin').val();
+        var password = $('#passwordInputSignin').val();
+        event.preventDefault();
+        signin(email, password,
+            function signinSuccess() {
+                console.log('Successfully Logged In');
+                window.location.href = 'ride.html';
+            },
+            function signinError(err) {
+                alert(err);
+            }
+        );
+    }
 
-
+    // Обработчик регистрации
     function handleRegister(event) {
         var email = $('#emailInputRegister').val();
         var password = $('#passwordInputRegister').val();
@@ -164,6 +171,7 @@ function signin(email, password, onSuccess, onFailure) {
         }
     }
 
+    // Обработчик подтверждения регистрации
     function handleVerify(event) {
         var email = $('#emailInputVerify').val();
         var code = $('#codeInputVerify').val();
@@ -181,3 +189,4 @@ function signin(email, password, onSuccess, onFailure) {
         );
     }
 }(jQuery));
+</script>

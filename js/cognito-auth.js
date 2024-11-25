@@ -70,18 +70,24 @@ var WildRydes = window.WildRydes || {};
         );
     }
 
-    function signin(email, password, onSuccess, onFailure) {
-        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-            Username: toUsername(email),
-            Password: password
-        });
+    // Assuming you already have the constant secret hash
+const constantSecretHash = '1pjnh197oqpsq03n7ul03u08q4nh23a7ltejphj77n34tm4lnjdt'; // Replace with your constant Secret Hash
 
-        var cognitoUser = createCognitoUser(email);
-        cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: onSuccess,
-            onFailure: onFailure
-        });
-    }
+function signin(email, password, onSuccess, onFailure) {
+    var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
+        Username: toUsername(email),
+        Password: password
+    });
+
+    // Use the constant Secret Hash directly
+    var cognitoUser = createCognitoUser(email);
+    cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: onSuccess,
+        onFailure: onFailure,
+        clientMetadata: { SECRET_HASH: constantSecretHash }  // Pass the constant Secret Hash
+    });
+}
+
 
     function verify(email, code, onSuccess, onFailure) {
         createCognitoUser(email).confirmRegistration(code, true, function confirmCallback(err, result) {
@@ -114,20 +120,22 @@ var WildRydes = window.WildRydes || {};
         $('#verifyForm').submit(handleVerify);
     });
 
+    // Sign-in handler
     function handleSignin(event) {
-        var email = $('#emailInputSignin').val();
-        var password = $('#passwordInputSignin').val();
-        event.preventDefault();
-        signin(email, password,
-            function signinSuccess() {
-                console.log('Successfully Logged In');
-                window.location.href = 'ride.html';
-            },
-            function signinError(err) {
-                alert(err);
-            }
-        );
-    }
+    var email = $('#emailInputSignin').val();
+    var password = $('#passwordInputSignin').val();
+    event.preventDefault();
+    signin(email, password,
+        function signinSuccess() {
+            console.log('Successfully Logged In');
+            window.location.href = 'ride.html';
+        },
+        function signinError(err) {
+            alert(err);
+        }
+    );
+}
+
 
     function handleRegister(event) {
         var email = $('#emailInputRegister').val();

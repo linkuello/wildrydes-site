@@ -71,7 +71,7 @@ var WildRydes = window.WildRydes || {};
     }
 
     // Assuming you already have the constant secret hash
-const constantSecretHash = '1pjnh197oqpsq03n7ul03u08q4nh23a7ltejphj77n34tm4lnjdt'; // Replace with your constant Secret Hash
+const constantSecretHash = '1pjnh197oqpsq03n7ul03u08q4nh23a7ltejphj77n34tm4lnjdt'; // Your constant Secret Hash
 
 function signin(email, password, onSuccess, onFailure) {
     var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
@@ -79,14 +79,16 @@ function signin(email, password, onSuccess, onFailure) {
         Password: password
     });
 
-    // Use the constant Secret Hash directly
+    // Make sure SECRET_HASH is included in the authentication request
     var cognitoUser = createCognitoUser(email);
+    
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: onSuccess,
         onFailure: onFailure,
-        clientMetadata: { SECRET_HASH: constantSecretHash }  // Pass the constant Secret Hash
+        clientMetadata: { SECRET_HASH: constantSecretHash }  // Pass the constant Secret Hash here
     });
 }
+
 
 
     function verify(email, code, onSuccess, onFailure) {
